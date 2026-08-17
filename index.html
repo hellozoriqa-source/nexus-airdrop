@@ -7,7 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #f97316; /* Universal Orange */
+            --primary: #f97316;
             --primary-hover: #ea580c;
             --secondary: #3b82f6;
             --bg: #0b0b0f;
@@ -32,54 +32,6 @@
             justify-content: center;
         }
 
-        nav {
-            position: absolute;
-            top: 20px;
-            width: 100%;
-            max-width: 1200px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 20px;
-        }
-
-        .logo {
-            font-weight: 800;
-            font-size: 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .logo span { color: var(--primary); }
-
-        .status-badge {
-            background: rgba(249, 115, 22, 0.1);
-            color: var(--primary);
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            border: 1px solid rgba(249, 115, 22, 0.2);
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            background-color: var(--primary);
-            border-radius: 50%;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.7); }
-            70% { box-shadow: 0 0 0 6px rgba(249, 115, 22, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0); }
-        }
-
         .container {
             background: var(--card-bg);
             backdrop-filter: blur(12px);
@@ -95,21 +47,6 @@
         h1 { font-size: 2rem; margin: 0 0 10px 0; font-weight: 800; }
         .subtitle { color: var(--text-muted); margin-bottom: 30px; font-size: 0.95rem; line-height: 1.5; }
 
-        .stats {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 30px;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 12px;
-            border: 1px solid var(--border);
-        }
-
-        .stat-item { display: flex; flex-direction: column; align-items: center; }
-        .stat-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
-        .stat-value { font-weight: 700; font-size: 1.1rem; color: var(--text); }
-        .highlight { color: var(--primary); }
-
         .btn-primary {
             width: 100%;
             padding: 16px;
@@ -121,238 +58,95 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
         }
-
-        .btn-primary:hover {
-            background: var(--primary-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px -5px rgba(249, 115, 22, 0.4);
-        }
-
-        .btn-primary:disabled {
-            background: #334155;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        .btn-wallets {
-            margin-top: 15px;
-            background: transparent;
-            border: 1px solid var(--border);
-            color: var(--text-muted);
-            padding: 10px;
+        .btn-primary:hover { background: var(--primary-hover); }
+        
+        #status { margin-top: 20px; font-size: 14px; color: var(--text-muted); }
+        .connected-info { margin-top: 15px; color: #00ff96; font-size: 0.9rem; }
+        
+        .claim-section {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
             border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 8px;
-            width: 100%;
-        }
-        
-        .btn-wallets:hover {
-            background: rgba(255,255,255,0.05);
-            color: var(--text);
-        }
-
-        .footer { margin-top: 30px; font-size: 0.8rem; color: var(--text-muted); }
-        .hidden { display: none; }
-
-        .loader {
-            border: 2px solid rgba(255,255,255,0.1);
-            border-left-color: var(--primary);
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
-        .detected-wallet {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            background: rgba(59, 130, 246, 0.1);
-            color: var(--secondary);
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            margin-bottom: 10px;
-            border: 1px solid rgba(59, 130, 246, 0.2);
+            display: none;
         }
     </style>
 </head>
 <body>
 
-    <nav>
-        <div class="logo">
-            <div style="width:24px;height:24px;background:var(--primary);border-radius:6px;"></div>
-            NEXUS
-        </div>
-        <div class="status-badge">
-            <div class="status-dot"></div>
-            Universal Chain
-        </div>
-    </nav>
-
     <div class="container">
+        <h1>Nexus Airdrop</h1>
+        <p class="subtitle">Connect any wallet to claim your Universal Airdrop.</p>
         
-        <!-- Step 1: Connect -->
-        <div id="step1">
-            <h1>Airdrop Phase 1</h1>
-            <p class="subtitle">Connect your wallet to verify eligibility. <br>Claims are distributed instantly on-chain.</p>
-            
-            <div class="stats">
-                <div class="stat-item">
-                    <span class="stat-label">Total Distributed</span>
-                    <span class="stat-value">25M NEX</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">Participants</span>
-                    <span class="stat-value highlight" id="counter">14,203</span>
-                </div>
-            </div>
+        <button id="connectBtn" class="btn-primary">Connect Wallet</button>
+        <div id="status"></div>
+        <div id="connectedInfo" class="connected-info"></div>
 
-            <div id="detectedBadge" class="hidden detected-wallet">
-                Detected: <span id="walletName">MetaMask</span>
-            </div>
-
-            <button class="btn-primary" id="connectBtn" onclick="connectWallet()">
-                <span>Connect Wallet</span>
-            </button>
-            
-            <button class="btn-wallets" onclick="showWalletOptions()">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-                All Supported Wallets
-            </button>
-
-            <div class="footer">
-                Secured by Smart Contract • <a href="#" style="color:var(--text-muted);text-decoration:none;">View Contract</a>
-            </div>
+        <div id="claimSection" class="claim-section">
+            <p>You are eligible for <strong>100 NEX</strong> tokens.</p>
+            <button id="claimBtn" class="btn-primary" style="background-color: #00ff96; color: #000;">Claim Airdrop</button>
         </div>
-
-        <!-- Step 2: Balance -->
-        <div id="step2" class="hidden">
-            <h1>Eligibility Verified</h1>
-            <p class="subtitle">You have been allocated the maximum tier.</p>
-
-            <div style="background:rgba(0,0,0,0.3);padding:20px;border-radius:12px;margin-bottom:25px;border:1px solid var(--border);">
-                <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:5px;">Your Allocation</div>
-                <div style="font-size:2rem;font-weight:800;color:var(--primary);">10,000 NEX</div>
-                <div style="font-size:0.9rem;color:var(--text-muted);margin-top:5px;">~ $2,500.00 USD</div>
-            </div>
-
-            <button class="btn-primary" id="claimBtn" onclick="claimAirdrop()">
-                <span>Claim Airdrop</span>
-            </button>
-            
-            <div class="footer">
-                Gas fee: 0.002 ETH (Subsidized)
-            </div>
-        </div>
-
-        <!-- Step 3: Success -->
-        <div id="step3" class="hidden">
-            <div style="width:60px;height:60px;background:rgba(249, 115, 22, 0.1);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px auto;border:1px solid rgba(249, 115, 22, 0.3);">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-            </div>
-            <h1>Claim Successful!</h1>
-            <p class="subtitle">Tokens are being sent to your wallet.<br>Please check your transaction history.</p>
-            
-            <div style="font-size:0.85rem;color:var(--text-muted);background:rgba(0,0,0,0.2);padding:10px;border-radius:8px;">
-                Tx Hash: <span style="font-family:monospace;">0x8a...4f21</span>
-            </div>
-        </div>
-
     </div>
 
-    <script>
+    <!-- Web3 Onboard Library -->
+    <script type="module">
+        import { init, disconnect } from "https://cdn.skypack.dev/@web3-onboard/core";
+        import injectedModule from "https://cdn.skypack.dev/@web3-onboard/injected-wallets";
+
+        // Initialize Web3 Onboard
+        const wallets = injectedModule();
+        const initWeb3 = init({
+            wallets: [wallets],
+            chains: [
+                { id: '0x1', token: 'ETH', label: 'Ethereum Mainnet', rpcUrl: 'https://eth.llamarpc.com' },
+                { id: '0x89', token: 'MATIC', label: 'Polygon Mainnet', rpcUrl: 'https://polygon-rpc.com' },
+                // Add Solana if you want to support Phantom specifically via custom RPC
+            ],
+            appInfo: { appName: 'Nexus Airdrop' },
+        });
+
         const connectBtn = document.getElementById('connectBtn');
         const statusDiv = document.getElementById('status');
-        const container = document.querySelector('.container');
-
-        // Add these elements dynamically after connection
-        let eligibilityDiv = null;
-        let claimBtn = null;
+        const connectedInfo = document.getElementById('connectedInfo');
+        const claimSection = document.getElementById('claimSection');
 
         connectBtn.addEventListener('click', async () => {
-            if (typeof window.ethereum !== 'undefined') {
+            try {
                 statusDiv.textContent = "Connecting...";
-                try {
-                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                    const account = accounts[0];
+                // This opens a modal supporting MetaMask, Phantom, Trust Wallet, etc.
+                const walletList = await initWeb3.connectWallet();
+                
+                if (walletList && walletList.length > 0) {
+                    const wallet = walletList[0];
+                    const address = wallet.accounts[0].address;
                     
-                    // Update UI for connected state
-                    connectBtn.textContent = "Wallet Connected";
-                    connectBtn.disabled = true;
-                    statusDiv.textContent = `Connected: ${account.slice(0, 6)}...${account.slice(-4)}`;
-
-                    // Add Eligibility Section
-                    addEligibilitySection(account);
-
-                } catch (error) {
-                    statusDiv.textContent = "Connection rejected.";
-                    console.error(error);
+                    connectBtn.style.display = 'none';
+                    connectedInfo.textContent = `Connected: ${address.slice(0, 6)}...${address.slice(-4)} (${wallet.chainId})`;
+                    statusDiv.textContent = "Wallet connected successfully.";
+                    
+                    // Show Claim Section after a short delay
+                    setTimeout(() => {
+                        claimSection.style.display = 'block';
+                    }, 1000);
                 }
-            } else {
-                statusDiv.textContent = "MetaMask not detected.";
+            } catch (error) {
+                statusDiv.textContent = "Connection cancelled or failed.";
+                console.error(error);
             }
         });
 
-        function addEligibilitySection(account) {
-            // Create a new div for eligibility
-            eligibilityDiv = document.createElement('div');
-            eligibilityDiv.style.marginTop = "20px";
-            eligibilityDiv.innerHTML = `
-                <p style="color: #94a3b8; font-size: 0.9rem;">Checking eligibility...</p>
-                <div id="eligibility-content" style="display: none; margin-top: 15px;">
-                    <!-- Content will be injected here -->
-                </div>
-            `;
-            container.appendChild(eligibilityDiv);
-
-            // Simulate API check delay
+        // Mock Claim Logic
+        document.getElementById('claimBtn').addEventListener('click', () => {
+            statusDiv.textContent = "Processing claim...";
             setTimeout(() => {
-                const contentDiv = document.getElementById('eligibility-content');
-                contentDiv.style.display = 'block';
-                
-                // Mock logic: Let's say everyone is eligible for this demo
-                const isEligible = true; 
-
-                if (isEligible) {
-                    eligibilityDiv.querySelector('p').textContent = "Eligible!";
-                    eligibilityDiv.querySelector('p').style.color = "#00ff96";
-                    
-                    contentDiv.innerHTML = `
-                        <p style="margin-bottom: 10px;">You qualify for <strong>100 NEX</strong> tokens.</p>
-                        <button id="claimBtn" style="background-color: #00ff96; color: #1a1a1a; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold;">
-                            Claim Airdrop
-                        </button>
-                    `;
-
-                    // Add Claim Logic
-                    document.getElementById('claimBtn').addEventListener('click', () => {
-                        statusDiv.textContent = "Processing claim...";
-                        setTimeout(() => {
-                            statusDiv.textContent = "Claimed! 100 NEX sent to your wallet.";
-                            eligibilityDiv.style.display = 'none';
-                        }, 2000);
-                    });
-
-                } else {
-                    eligibilityDiv.querySelector('p').textContent = "Not Eligible.";
-                    eligibilityDiv.querySelector('p').style.color = "#ff4444";
-                    contentDiv.innerHTML = "<p>You need more activity to qualify.</p>";
-                }
-            }, 1500); // Simulate 1.5s network delay
-        }
+                statusDiv.textContent = "Claimed! 100 NEX sent to your wallet.";
+                claimSection.style.display = 'none';
+                connectBtn.textContent = "Claimed";
+                connectBtn.disabled = true;
+                connectBtn.style.display = 'block';
+            }, 2000);
+        });
     </script>
 </body>
 </html>
