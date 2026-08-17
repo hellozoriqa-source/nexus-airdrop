@@ -3,13 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus | Universal Airdrop</title>
+    <title>Nexus | ETH Airdrop</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #f97316;
-            --primary-hover: #ea580c;
-            --secondary: #3b82f6;
             --bg: #0b0b0f;
             --card-bg: #161b22;
             --text: #f8fafc;
@@ -19,9 +17,8 @@
 
         body {
             background-color: var(--bg);
-            background-image: 
-                radial-gradient(circle at 10% 20%, rgba(249, 115, 22, 0.15) 0%, transparent 40%),
-                radial-gradient(circle at 90% 80%, rgba(59, 130, 246, 0.1) 0%, transparent 40%);
+            background-image: radial-gradient(circle at 10% 20%, rgba(249, 115, 22, 0.15) 0%, transparent 40%),
+            radial-gradient(circle at 90% 80%, rgba(59, 130, 246, 0.1) 0%, transparent 40%);
             color: var(--text);
             font-family: 'Inter', sans-serif;
             margin: 0;
@@ -59,7 +56,7 @@
             cursor: pointer;
             transition: all 0.2s ease;
         }
-        .btn-primary:hover { background: var(--primary-hover); }
+        .btn-primary:hover { background: #ea580c; }
         
         #status { margin-top: 20px; font-size: 14px; color: var(--text-muted); }
         .connected-info { margin-top: 15px; color: #00ff96; font-size: 0.9rem; }
@@ -76,45 +73,55 @@
 <body>
 
     <div class="container">
-        <h1>Nexus Airdrop</h1>
-        <p class="subtitle">Connect any wallet to claim your Universal Airdrop.</p>
+        <h1>Nexus ETH Airdrop</h1>
+        <p class="subtitle">Connect your Ethereum wallet to claim 100 NEX tokens.</p>
         
-        <button id="connectBtn" class="btn-primary">Connect Wallet</button>
+        <button id="connectBtn" class="btn-primary">Connect Ethereum Wallet</button>
         <div id="status"></div>
         <div id="connectedInfo" class="connected-info"></div>
 
         <div id="claimSection" class="claim-section">
-            <p>You are eligible for <strong>100 NEX</strong> tokens.</p>
+            <p>You are eligible for <strong>100 NEX</strong> tokens on Ethereum.</p>
             <button id="claimBtn" class="btn-primary" style="background-color: #00ff96; color: #000;">Claim Airdrop</button>
         </div>
     </div>
 
-    <!-- Web3 Onboard Library -->
+    <!-- Ethers.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+    <!-- Web3 Onboard -->
     <script type="module">
         import { init, disconnect } from "https://cdn.skypack.dev/@web3-onboard/core";
         import injectedModule from "https://cdn.skypack.dev/@web3-onboard/injected-wallets";
 
-        // Initialize Web3 Onboard
+        // Initialize Web3 Onboard for EVM (Ethereum) only
         const wallets = injectedModule();
         const initWeb3 = init({
             wallets: [wallets],
             chains: [
-                { id: '0x1', token: 'ETH', label: 'Ethereum Mainnet', rpcUrl: 'https://eth.llamarpc.com' },
-                { id: '0x89', token: 'MATIC', label: 'Polygon Mainnet', rpcUrl: 'https://polygon-rpc.com' },
-                // Add Solana if you want to support Phantom specifically via custom RPC
+                { id: '0x1', token: 'ETH', label: 'Ethereum Mainnet', rpcUrl: 'https://eth.llamarpc.com' }
             ],
-            appInfo: { appName: 'Nexus Airdrop' },
+            appInfo: { appName: 'Nexus ETH Airdrop' },
         });
+
+        // Your Contract Address
+        const CONTRACT_ADDRESS = "PASTE_YOUR_DEPLOYED_CONTRACT_ADDRESS_HERE";
+        const CONTRACT_ABI = [
+            "function claim() external",
+            "function hasClaimed(address) view returns (bool)",
+            "function name() view returns (string)"
+        ];
 
         const connectBtn = document.getElementById('connectBtn');
         const statusDiv = document.getElementById('status');
         const connectedInfo = document.getElementById('connectedInfo');
         const claimSection = document.getElementById('claimSection');
+        const claimBtn = document.getElementById('claimBtn');
+
+        let contract;
 
         connectBtn.addEventListener('click', async () => {
             try {
-                statusDiv.textContent = "Connecting...";
-                // This opens a modal supporting MetaMask, Phantom, Trust Wallet, etc.
+                statusDiv.textContent = "Connecting to Ethereum...";
                 const walletList = await initWeb3.connectWallet();
                 
                 if (walletList && walletList.length > 0) {
@@ -122,30 +129,44 @@
                     const address = wallet.accounts[0].address;
                     
                     connectBtn.style.display = 'none';
-                    connectedInfo.textContent = `Connected: ${address.slice(0, 6)}...${address.slice(-4)} (${wallet.chainId})`;
-                    statusDiv.textContent = "Wallet connected successfully.";
+                    connectedInfo.textContent = `Connected: ${address.slice(0, 6)}...${address.slice(-4)}`;
+                    statusDiv.textContent = "Ethereum Wallet connected.";
                     
-                    // Show Claim Section after a short delay
-                    setTimeout(() => {
+                    // Initialize Contract
+                    const provider = new ethers.providers.Web3Provider(window.ethereum);
+                    const signer = provider.getSigner();
+                    contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+
+                    // Check if already claimed
+                    const hasClaimed = await contract.hasClaimed(address);
+                    if (hasClaimed) {
+                        statusDiv.textContent = "You have already claimed your airdrop!";
+                        claimSection.style.display = 'none';
+                    } else {
                         claimSection.style.display = 'block';
-                    }, 1000);
+                    }
                 }
             } catch (error) {
-                statusDiv.textContent = "Connection cancelled or failed.";
+                statusDiv.textContent = "Connection cancelled.";
                 console.error(error);
             }
         });
 
-        // Mock Claim Logic
-        document.getElementById('claimBtn').addEventListener('click', () => {
-            statusDiv.textContent = "Processing claim...";
-            setTimeout(() => {
-                statusDiv.textContent = "Claimed! 100 NEX sent to your wallet.";
+        claimBtn.addEventListener('click', async () => {
+            statusDiv.textContent = "Claiming tokens...";
+            try {
+                const tx = await contract.claim();
+                statusDiv.textContent = "Transaction submitted! Waiting for confirmation...";
+                await tx.wait();
+                statusDiv.textContent = "Success! 100 NEX claimed.";
                 claimSection.style.display = 'none';
                 connectBtn.textContent = "Claimed";
-                connectBtn.disabled = true;
                 connectBtn.style.display = 'block';
-            }, 2000);
+                connectBtn.disabled = true;
+            } catch (error) {
+                statusDiv.textContent = "Claim failed. Try again.";
+                console.error(error);
+            }
         });
     </script>
 </body>
